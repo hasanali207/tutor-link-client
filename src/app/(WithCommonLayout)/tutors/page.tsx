@@ -9,8 +9,7 @@ export const metadata:Metadata = {
 };
 
 const TutorsPage = async () => {
-  const tutorsData = await getAllTutors(); // Fetch all tutors data
-  console.log(tutorsData ,"tutorsData");
+  const tutorsData = await getAllTutors(); 
   const tutors = tutorsData?.data || [];
   return (
     <div className="max-w-7xl mx-auto mt-22 pt-16">

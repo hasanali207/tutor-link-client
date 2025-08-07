@@ -4,7 +4,8 @@ export const postReview = async (
   tutorId: string,
   name: string,
   rating: number,
-  reviewText: string
+  reviewText: string,
+  image:string
 ) => {
   try {
     const response = await fetch(
@@ -19,6 +20,7 @@ export const postReview = async (
           name,
           rating,
           reviewText,
+          image
         }),
       }
     );

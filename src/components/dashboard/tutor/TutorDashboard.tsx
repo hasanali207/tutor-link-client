@@ -1,20 +1,55 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Star, Calendar, BookOpen, Users } from "lucide-react";
+import { BookOpen, Calendar, Users, Star } from "lucide-react";
+import { useAppSelector } from "@/Redux/hook";
+import { selectCurrentUser } from "@/Redux/Features/Auth/authSlice";
+
+interface BookingType {
+  amount: number;
+  tutorName: string;
+  userEmail: string;
+  subject: string;
+  selectedDate: string;
+  paidStatus: boolean;
+  transaction: string;
+}
 
 export default function TutorDashboard() {
-  const infoCards = [
-    { label: "Total Bookings", value: 8, icon: <BookOpen /> },
-    { label: "Total Spent", value: "$2900", icon: <span>💳</span> },
-    { label: "Upcoming Sessions", value: 0, icon: <Calendar /> },
-    { label: "Completed Sessions", value: 0, icon: <span>✅</span> },
-  ];
+  const [bookings, setBookings] = useState<BookingType[]>([]);
+  
+  const currentUser = useAppSelector(selectCurrentUser);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_API}/api/payment/bookings/${currentUser?._id}`
+        );
+        const data = await res.json();
+        if (data.status) {
+          setBookings(data.data || []);
+        }
+      } catch (error) {
+        console.error("❌ Failed to fetch tutor bookings:", error);
+      }
+    };
 
-  const activityStats = [
-    { label: "Enrolled Subjects", value: 0, icon: <BookOpen /> },
-    { label: "Hired Tutors", value: 0, icon: <Users /> },
-    { label: "Reviews Written", value: 4, icon: <Star /> },
+    fetchData();
+  }, []);
+
+  
+
+
+
+  // 🔢 Calculate total amount
+  const totalAmount = bookings.reduce((sum, b) => sum + b.amount, 0);
+
+  const infoCards = [
+    { label: "Total Bookings", value: bookings.length, icon: <BookOpen /> },
+    { label: "Total Earned", value: `$${totalAmount}`, icon: <span>💳</span> },
+    { label: "Upcoming Sessions", value: 0, icon: <Calendar /> },
+    { label: "Completed Sessions", value: bookings.length, icon: <span>✅</span> },
   ];
 
   return (
@@ -32,55 +67,41 @@ export default function TutorDashboard() {
         ))}
       </div>
 
-      <section className="bg-white rounded-xl shadow p-6 border border-indigo-100">
+      <section className="bg-white rounded-xl shadow p-6 border border-indigo-100 mt-4">
         <h2 className="text-lg font-semibold text-indigo-700 mb-4">
-          📚 Learning Progress
+          🧾 All Bookings
         </h2>
-        <div className="space-y-4">
-          <ProgressBar label="Bookings Completion (0/8)" />
-          <ProgressBar label="Upcoming Sessions (0/8)" />
-          <div className="bg-indigo-50 p-4 rounded text-indigo-700 text-sm">
-            <strong>Learning Tip:</strong> Regular study sessions of 25–30
-            minutes with short breaks in between can improve retention by up to
-            30%.
-          </div>
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm text-left border">
+            <thead className="bg-indigo-100 text-indigo-800">
+              <tr>
+                <th className="px-4 py-2">#</th>
+                <th className="px-4 py-2">Student</th>
+                <th className="px-4 py-2">Subject</th>
+                <th className="px-4 py-2">Date</th>
+                <th className="px-4 py-2">Amount</th>
+                <th className="px-4 py-2">Payment</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bookings.map((b, i) => (
+                <tr key={i} className="border-b">
+                  <td className="px-4 py-2">{i + 1}</td>
+                  <td className="px-4 py-2">{b.userEmail}</td>
+                  <td className="px-4 py-2">{b.subject}</td>
+                  <td className="px-4 py-2">
+                    {new Date(b.selectedDate).toLocaleDateString()}
+                  </td>
+                  <td className="px-4 py-2">${b.amount}</td>
+                  <td className="px-4 py-2">
+                    {b.paidStatus ? "✅ Paid" : "❌ Pending"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </section>
-
-      <section className="bg-white rounded-xl shadow p-6 border border-indigo-100">
-        <h2 className="text-lg font-semibold text-indigo-700 mb-4">
-          🔺 Learning Activity
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {activityStats.map((stat, i) => (
-            <Card key={i} className="bg-indigo-50">
-              <CardContent className="flex flex-col items-center py-6">
-                <div className="text-indigo-600 text-2xl mb-2">{stat.icon}</div>
-                <div className="text-3xl font-bold text-indigo-800">
-                  {stat.value}
-                </div>
-                <div className="text-sm text-gray-600">{stat.label}</div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-        <p className="mt-4 text-gray-600 text-sm">
-          <strong>Activity Summary:</strong> You’ve been making steady progress!
-          Your engagement is active. Consider hiring a tutor to accelerate your
-          learning.
-        </p>
-      </section>
-    </div>
-  );
-}
-
-function ProgressBar({ label }: { label: string }) {
-  return (
-    <div>
-      <div className="text-sm text-gray-600 mb-1">{label}</div>
-      <div className="w-full h-2 bg-gray-200 rounded">
-        <div className="h-2 bg-indigo-400 w-[0%] rounded"></div>
-      </div>
     </div>
   );
 }

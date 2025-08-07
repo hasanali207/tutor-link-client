@@ -1,10 +1,10 @@
-import BookingTable from "@/components/dashboard/student/Mybookings";
+import TutorDashboard from "@/components/dashboard/tutor/TutorDashboard";
 import React from "react";
 
 const page = () => {
   return (
     <>
-      <BookingTable />
+      <TutorDashboard />
     </>
   );
 };

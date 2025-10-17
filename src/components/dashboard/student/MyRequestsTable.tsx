@@ -97,8 +97,12 @@ const handlePayment = async (request: any) => {
               </td>
               <td className="p-3">{d.tutorId?.name}</td>
               <td className="p-3">
-                {new Date(d.tutorId?.availability?.from).toISOString().split("T")[0]} -
-                {new Date(d.tutorId?.availability?.to).toISOString().split("T")[0]}
+                <td className="p-3">
+  {d.tutorId?.availability?.from && d.tutorId?.availability?.to
+    ? `${new Date(d.tutorId.availability.from).toLocaleDateString("en-CA")} - ${new Date(d.tutorId.availability.to).toLocaleDateString("en-CA")}`
+    : "N/A"}
+</td>
+
               </td>
               <td className="p-3">
                 <span

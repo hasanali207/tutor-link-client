@@ -9,7 +9,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
-import { FaGithub, FaGoogle } from "react-icons/fa";
 
 const LoginForm = () => {
   const router = useRouter();
@@ -28,59 +27,57 @@ const LoginForm = () => {
     setShowPassword((prev) => !prev);
   };
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  try {
-    const res = await loginUser(formData);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await loginUser(formData);
 
-    if (res?.success) {
-      const userFromToken = verifyToken(res?.data?.accessToken) as TUser;
+      if (res?.success) {
+        const userFromToken = verifyToken(res?.data?.accessToken) as TUser;
 
-           
-      const userRes = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_API}/api/users/${userFromToken._id}`
-      );
-      if (!userRes.ok) throw new Error("Failed to fetch full user profile");
-      const fullUserData = await userRes.json();
+        const userRes = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_API}/api/users/${userFromToken._id}`,
+        );
+        if (!userRes.ok) throw new Error("Failed to fetch full user profile");
+        const fullUserData = await userRes.json();
 
-      const user = fullUserData.data || fullUserData.user || fullUserData;
+        const user = fullUserData.data || fullUserData.user || fullUserData;
 
-       // এখানে important data আলাদা করে নিচ্ছি
-      const importantUserData = {
-        _id:user._id,
-        email: user.email,
-        name: user.name,
-        image: user.image,
-        role: user.role,
-        isProfileComplete: user.isProfileComplete,
-      };
+        // এখানে important data আলাদা করে নিচ্ছি
+        const importantUserData = {
+          _id: user._id,
+          email: user.email,
+          name: user.name,
+          image: user.image,
+          role: user.role,
+          isProfileComplete: user.isProfileComplete,
+        };
 
-      dispatch(setUser({ user: importantUserData, token: res?.data?.accessToken }));
-      
-   
+        dispatch(
+          setUser({ user: importantUserData, token: res?.data?.accessToken }),
+        );
 
-      toast.success(res?.message);
+        toast.success(res?.message);
 
-      if (user.isProfileComplete == false) {
-        if (user.role === "Student") {
-          router.push("/studentdashboard/profile");
-        } else if (user.role === "Tutor") {
-          router.push("/tutor/profile");
+        if (user.isProfileComplete == false) {
+          if (user.role === "Student") {
+            router.push("/studentdashboard/profile");
+          } else if (user.role === "Tutor") {
+            router.push("/tutor/profile");
+          }
+        } else if (redirect) {
+          router.push(redirect);
+        } else {
+          router.push("/");
         }
-      } else if (redirect) {
-        router.push(redirect);
       } else {
-        router.push("/");
+        toast.error(res?.message);
       }
-    } else {
-      toast.error(res?.message);
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Login failed");
     }
-  } catch (err: any) {
-    console.error(err);
-    toast.error("Login failed");
-  }
-};
-
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-r flex items-center justify-center px-4 py-5">
@@ -150,18 +147,6 @@ const handleSubmit = async (e: React.FormEvent) => {
 
         {/* Social Login Buttons */}
         <div className="text-center mt-6 space-y-4">
-          <p className="text-sm text-gray-600">Or login with</p>
-
-          <button className="w-full flex items-center justify-center py-3 border border-gray-300 rounded-md bg-gray-100 text-black hover:bg-gray-200 transition duration-300">
-            <FaGithub size={20} className="mr-3" />
-            GitHub
-          </button>
-
-          <button className="w-full flex items-center justify-center py-3 border border-gray-300 rounded-md bg-gray-100 text-black hover:bg-gray-200 transition duration-300">
-            <FaGoogle size={20} className="mr-3" />
-            Google
-          </button>
-
           <p className="flex items-center justify-center mt-6">
             <Link
               href="/"

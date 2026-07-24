@@ -1,11 +1,11 @@
+import ReduxProvider from "@/Redux/provider";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
 import { Toaster } from "react-hot-toast";
-import ReduxProvider from "@/Redux/provider";
+import "./globals.css";
 
-import { ThemeProvider } from "next-themes";
 import DarkModeToggle from "@/components/darkMood/DarkMoodToggle";
+import { ThemeProvider } from "next-themes";
 
 import Providers from "@/providers/Providers";
 
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   description: "Providing a platform for tutors and students to connect",
   icons: {
     icon: "https://i.ibb.co.com/FqcCMRkT/logo.png",
-    },
+  },
 };
 
 export default function RootLayout({

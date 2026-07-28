@@ -16,10 +16,10 @@ type ProfileForm = {
 export default function ProfileCard() {
   const dispatch = useAppDispatch();
   const currentUser = useAppSelector(selectCurrentUser);
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState(null);
 
-  console.log('user from db', user)
-  console.log('user from redux', currentUser)
+  // console.log('user from db', user)
+  // console.log('user from redux', currentUser)
 
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState<ProfileForm>({
@@ -35,10 +35,10 @@ export default function ProfileCard() {
       try {
         if (!currentUser?.email) return;
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_API}/api/users/${currentUser._id}`
+          `${process.env.NEXT_PUBLIC_BASE_API}/api/users/${currentUser._id}`,
         );
         const data = await res.json();
-         setUser(data.data)
+        setUser(data.data);
         setFormData({
           name: data.data.name || "",
           email: data.data.email || "",
@@ -66,7 +66,6 @@ export default function ProfileCard() {
       const payload = {
         ...formData,
         isProfileComplete: true,
-        
       };
 
       const res = await fetch(
@@ -78,7 +77,7 @@ export default function ProfileCard() {
           },
           credentials: "include",
           body: JSON.stringify(payload),
-        }
+        },
       );
 
       const result = await res.json();
@@ -86,11 +85,11 @@ export default function ProfileCard() {
 
       dispatch(
         updateUser({
-                    ...currentUser,
-                    name: updated.name,
-                    image: updated.image,
-                    isProfileComplete: updated.isProfileComplete,
-                  })
+          ...currentUser,
+          name: updated.name,
+          image: updated.image,
+          isProfileComplete: updated.isProfileComplete,
+        }),
       );
 
       setEditMode(false);

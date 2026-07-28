@@ -1,11 +1,15 @@
 "use client";
 
-import Link from "next/link";
-import { useEffect, useState } from "react";
 import { LayoutDashboard, LogIn, LogOut, Menu, X } from "lucide-react";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 // import { useUser } from "@/context/UserContext";
+import { logout, selectCurrentUser } from "@/Redux/Features/Auth/authSlice";
+import { useAppDispatch, useAppSelector } from "@/Redux/hook";
+import { persistor } from "@/Redux/store";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,17 +18,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { useAppDispatch,useAppSelector } from "@/Redux/hook";
-import { persistor } from "@/Redux/store";
-import { logout, selectCurrentUser} from '@/Redux/Features/Auth/authSlice';
-
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
   const currentUser = useAppSelector(selectCurrentUser);
   const navLinks = [
     { label: "Home", href: "/" },
@@ -36,10 +35,10 @@ const NavBar = () => {
   ];
 
   // const { user, setIsLoading } = useUser();
-  const user =useAppSelector((state)=>state.auth.user)
+  const user = useAppSelector((state) => state.auth.user);
   const router = useRouter();
   // const location = usePathname();
- 
+
   const handleScroll = () => {
     setScrolled(window.scrollY > 20);
   };
@@ -56,7 +55,6 @@ const NavBar = () => {
     // if (protectedRoutes.some((route) => location.match(route))) {
     //   router.push("/");
     // }
-    
   };
 
   const linkClasses = (href: string) =>
@@ -108,7 +106,7 @@ const NavBar = () => {
               <DropdownMenuTrigger>
                 <Avatar>
                   <AvatarImage
-                    src={currentUser.image}
+                    src={currentUser?.image}
                     alt="User Profile Picture"
                     className="w-10 h-10 rounded-full"
                   />

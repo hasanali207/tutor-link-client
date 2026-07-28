@@ -1,6 +1,7 @@
 "use server";
 
-import { jwtDecode } from "jwt-decode";
+import { IUser } from "@/types/user";
+import { jwtDecode, JwtPayload } from "jwt-decode";
 import { cookies } from "next/headers";
 import { FieldValues } from "react-hook-form";
 
@@ -9,7 +10,7 @@ const NEXT_PUBLIC_BASE_API = process.env.NEXT_PUBLIC_BASE_API;
 
 if (!NEXT_PUBLIC_BASE_API) {
   throw new Error(
-    "❌ Environment variable NEXT_PUBLIC_BASE_API is not defined."
+    "❌ Environment variable NEXT_PUBLIC_BASE_API is not defined.",
   );
 }
 
@@ -72,13 +73,29 @@ export const loginUser = async (userData: FieldValues) => {
 };
 
 // ✅ Get Current User (from token)
-export const getCurrentUser = async () => {
-  const accessToken = (await cookies()).get("accessToken")?.value;
-  if (!accessToken) return null;
-
+export const getCurrentUser = async (): Promise<IUser | null> => {
   try {
-    const decoded = jwtDecode(accessToken);
-    return decoded;
+    const accessToken = (await cookies()).get("accessToken")?.value;
+    if (!accessToken) return null;
+
+    const decoded = jwtDecode<
+      JwtPayload & {
+        _id: string;
+        name: string;
+        email: string;
+        role: "Student" | "Tutor";
+      }
+    >(accessToken);
+
+    const user: IUser = {
+      _id: decoded._id,
+      name: decoded.name,
+      email: decoded.email,
+      role: decoded.role,
+      // IUser-এ যা যা field আছে সেগুলো এখানে explicit ম্যাপ করো
+    };
+
+    return user;
   } catch (error) {
     return null;
   }

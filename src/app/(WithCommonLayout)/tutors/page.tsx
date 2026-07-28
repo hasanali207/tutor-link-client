@@ -1,15 +1,14 @@
 import BrowseTutors from "@/components/modules/tutor/BrowseTutors";
 import { getAllTutors } from "@/services/tutor";
-import React from "react";
-import type { Metadata } from 'next'
+import type { Metadata } from "next";
 
-export const metadata:Metadata = {
+export const metadata: Metadata = {
   title: "TutorLink | Tutors",
   description: "Find an online tutor to help you study",
 };
 
 const TutorsPage = async () => {
-  const tutorsData = await getAllTutors(); 
+  const tutorsData = await getAllTutors();
   const tutors = tutorsData?.data || [];
   return (
     <div className="max-w-7xl mx-auto mt-22 pt-16">
@@ -23,7 +22,8 @@ const TutorsPage = async () => {
       </p>
 
       <div>
-        <BrowseTutors tutors= {tutors}></BrowseTutors> {/* Pass the fetched tutors data to the BrowseTutors component */}
+        <BrowseTutors tutors={tutors}></BrowseTutors>{" "}
+        {/* Pass the fetched tutors data to the BrowseTutors component */}
       </div>
     </div>
   );

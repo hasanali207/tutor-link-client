@@ -1,10 +1,10 @@
 "use client";
-import Image from "next/image";
 import { motion } from "framer-motion";
+import Image from "next/image";
 // import img from "../../../public/tutor.jpg";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { IUser } from "@/types/user";
+import Link from "next/link";
 
 const TutorSection = ({ tutors }: { tutors: IUser[] }) => {
   // const tutors = [
@@ -50,36 +50,41 @@ const TutorSection = ({ tutors }: { tutors: IUser[] }) => {
             transition={{ duration: 0.4, delay: idx * 0.1 }}
             className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-md dark:shadow-lg group relative transform transition-transform duration-300 hover:scale-105"
           >
-            <div className="relative w-full h-60">
+            <div className="relative w-full h-60 overflow-hidden">
               <Image
-                src={tutor?.image || "https://i.ibb.co/6s0x5gD/default-profile.png"}
+                src={
+                  tutor?.image || "https://i.ibb.co/6s0x5gD/default-profile.png"
+                }
                 alt={tutor?.name || "tutor"}
                 layout="fill"
                 objectFit="cover"
                 className="group-hover:scale-105 transition-transform duration-300"
               />
+
+              {/* Overlay + button, image-এর ওপর, content-কে touch করছে না */}
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
+                <Link
+                  href={`/tutors/${tutor?._id}`}
+                  className="bg-blue-600 text-white text-sm px-4 py-1.5 rounded-md shadow-lg hover:bg-blue-700 translate-y-2 group-hover:translate-y-0 transition duration-300"
+                >
+                  View Profile
+                </Link>
+              </div>
             </div>
+
             <div className="p-4 space-y-1">
               <h3 className="text-xl font-bold text-gray-800 group-hover:text-blue-600 transition duration-300">
                 {tutor?.name}
               </h3>
-              <p className="text-red-400 font-semibold ">
-                {" "}
+              <p className="text-red-400 font-semibold">
                 {tutor?.subjects?.split(",").map((subject, index) => (
                   <span key={index}>
-                    {index > 0 ? ", " : ""}{subject}
+                    {index > 0 ? ", " : ""}
+                    {subject}
                   </span>
                 ))}
               </p>
               <p className="text-sm text-gray-600">{tutor?.bio}</p>
-            </div>
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition duration-300">
-              <Link
-                href={`/tutors/${tutor?._id}`}
-                className="bg-blue-600 text-white text-sm px-4 py-1.5 rounded-md shadow-lg hover:bg-blue-700"
-              >
-                View Profile
-              </Link>
             </div>
           </motion.div>
         ))}

@@ -1,4 +1,3 @@
-
 import { getCurrentUser } from "@/services/auth";
 import { IUser } from "@/types/user";
 import {
@@ -27,7 +26,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const handleUser = async () => {
       try {
         const user = await getCurrentUser();
-        setUser(user);
+        setUser(user ?? null);
       } catch (error) {
         console.error("Error loading user:", error);
         setUser(null);

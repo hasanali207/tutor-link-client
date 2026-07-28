@@ -1,26 +1,27 @@
 "use client";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import { IUser } from "@/types/user";
-import { sendTutorPermit } from "@/services/sendTutorPermits";
-import { getReviews, postReview } from "@/services/review";
-import { useAppSelector } from "@/Redux/hook";
 import { selectCurrentUser } from "@/Redux/Features/Auth/authSlice";
+import { useAppSelector } from "@/Redux/hook";
+import { getReviews, postReview } from "@/services/review";
+import { sendTutorPermit } from "@/services/sendTutorPermits";
+import { IUser } from "@/types/user";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
+import StarRating from "@/components/shared/starRating";
+import { Button } from "@/components/ui/button";
+import { CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { CardContent } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
 import {
   BookDown,
   CalendarCheck2,
@@ -36,7 +37,6 @@ import {
   UserSearch,
 } from "lucide-react";
 import tutorImg from "../../../../../public/tutor.jpg";
-import StarRating from "@/components/shared/starRating";
 
 export interface IReview {
   tutorId: string;
@@ -55,9 +55,9 @@ const DetailsProfiles = ({ tutor }: { tutor: IUser | null }) => {
   const [requestStatus, setRequestStatus] = useState<string | null>(null);
   const user = useAppSelector(selectCurrentUser);
   const router = useRouter();
-  const [tutorData, setTutorData] = useState<IUser | null>(tutor); 
+  const [tutorData, setTutorData] = useState<IUser | null>(tutor);
 
-  console.log(tutorData)
+  // console.log(tutorData)
   useEffect(() => {
     if (tutor?._id) {
       fetchReviews();
@@ -96,15 +96,13 @@ const DetailsProfiles = ({ tutor }: { tutor: IUser | null }) => {
       return;
     }
 
-
     const response = await postReview(
-    tutor!._id,
-    reviewerName,
-    rating,
-    reviewText,
-    user?.image || ""
-  );
-
+      tutor!._id,
+      reviewerName,
+      rating,
+      reviewText,
+      user?.image || "",
+    );
 
     if (response.success) {
       toast.success("Review submitted successfully!");
@@ -113,11 +111,11 @@ const DetailsProfiles = ({ tutor }: { tutor: IUser | null }) => {
       setRating(5);
       fetchReviews();
 
-
-
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/api/users/${tutor!._id}`);
-    const updatedTutor = await res.json();
-    setTutorData(updatedTutor.data);
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_API}/api/users/${tutor!._id}`,
+      );
+      const updatedTutor = await res.json();
+      setTutorData(updatedTutor.data);
     } else {
       toast.error(response.message || "Failed to submit review.");
     }
@@ -141,7 +139,7 @@ const DetailsProfiles = ({ tutor }: { tutor: IUser | null }) => {
       const response = await sendTutorPermit(
         tutor._id,
         user.email,
-        tutor?.price ?? 0
+        tutor?.price ?? 0,
       );
 
       if (response.success) {
@@ -185,12 +183,15 @@ const DetailsProfiles = ({ tutor }: { tutor: IUser | null }) => {
               <div className="absolute bottom-1 right-7 bg-green-600 p-1 rounded-full">
                 <CheckCircle className="text-white w-8 h-8" />
               </div>
-              
             </div>
-            <h2 className="text-xl mb-1 font-semibold mt-3">{tutorData?.name}</h2>
+            <h2 className="text-xl mb-1 font-semibold mt-3">
+              {tutorData?.name}
+            </h2>
             <div className="flex items-center gap-2 text-gray-500 text-sm">
               <StarRating rating={tutorData?.averageRating ?? 0} />
-              <span className="font-bold">{tutorData?.averageRating?.toFixed(1) || "0.0"}</span>
+              <span className="font-bold">
+                {tutorData?.averageRating?.toFixed(1) || "0.0"}
+              </span>
             </div>
             <div className="flex flex-wrap gap-2 my-4">
               {tutorData?.subjects?.split(",").map((subject, index) => (
@@ -219,8 +220,10 @@ const DetailsProfiles = ({ tutor }: { tutor: IUser | null }) => {
           </h2>
           <div className="py-5 bg-blue-800/20 flex gap-3 md:w-1/2 rounded-lg px-5 my-4">
             <CalendarDays color="#155dfc" size={18} />
-            {new Date(tutorData?.availability?.from || "").toLocaleDateString()} -{" "}
-            {new Date(tutorData?.availability?.to || "").toLocaleDateString()}
+            {new Date(
+              tutorData?.availability?.from || "",
+            ).toLocaleDateString()}{" "}
+            - {new Date(tutorData?.availability?.to || "").toLocaleDateString()}
           </div>
         </div>
 
@@ -303,7 +306,9 @@ const DetailsProfiles = ({ tutor }: { tutor: IUser | null }) => {
       {/* Review Section */}
       <div className="mt-16 shadow-[0px_0px_10px_theme(colors.blue.400)] rounded-lg bg-blue-800/20 p-8">
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-semibold text-gray-100">Student Reviews</h2>
+          <h2 className="text-2xl font-semibold text-gray-100">
+            Student Reviews
+          </h2>
           <Button
             variant="outline"
             className="bg-blue-600 text-white hover:text-blue-600 border-blue-600 flex items-center gap-2"
@@ -327,7 +332,9 @@ const DetailsProfiles = ({ tutor }: { tutor: IUser | null }) => {
                     className="rounded-full border border-blue-600"
                   />
                   <div>
-                    <h2 className="text-lg uppercase font-semibold">{review.name}</h2>
+                    <h2 className="text-lg uppercase font-semibold">
+                      {review.name}
+                    </h2>
                     <StarRating rating={review.rating} />
                   </div>
                 </div>
@@ -335,7 +342,9 @@ const DetailsProfiles = ({ tutor }: { tutor: IUser | null }) => {
               </div>
             ))
           ) : (
-            <p className="text-gray-500 text-center text-xl">No reviews yet...</p>
+            <p className="text-gray-500 text-center text-xl">
+              No reviews yet...
+            </p>
           )}
         </div>
       </div>

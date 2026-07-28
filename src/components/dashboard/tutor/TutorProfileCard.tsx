@@ -1,11 +1,8 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import { selectCurrentUser, updateUser } from "@/Redux/Features/Auth/authSlice";
 import { useAppDispatch, useAppSelector } from "@/Redux/hook";
-import {
-  updateUser,
-  selectCurrentUser,
-} from "@/Redux/Features/Auth/authSlice";
 import Image from "next/image";
+import React, { useEffect, useState } from "react";
 
 interface Availability {
   from: string;
@@ -25,16 +22,28 @@ interface FormDataType {
   price: string | number;
 }
 
+interface TutorUser {
+  name?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  image?: string;
+  bio?: string;
+  subjects?: string;
+  gradeLevel?: string;
+  availability?: {
+    from?: string;
+    to?: string;
+  };
+  price?: string | number;
+}
 
 export default function TutorProfileCard() {
   const dispatch = useAppDispatch();
   const currentUser = useAppSelector(selectCurrentUser);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<TutorUser | null>(null);
   const [editMode, setEditMode] = useState(false);
 
-  console.log('current user from Redux', currentUser)
-  console.log('user from DB', user)
-  
   const [formData, setFormData] = useState<FormDataType>({
     name: "",
     email: "",
@@ -57,7 +66,7 @@ export default function TutorProfileCard() {
         if (!currentUser?._id) return;
 
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_API}/api/users/${currentUser._id}`
+          `${process.env.NEXT_PUBLIC_BASE_API}/api/users/${currentUser._id}`,
         );
 
         if (!response.ok) {
@@ -91,7 +100,7 @@ export default function TutorProfileCard() {
   }, [currentUser]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
 
@@ -129,23 +138,22 @@ export default function TutorProfileCard() {
           headers: { "Content-Type": "application/json" },
           credentials: "include",
           body: JSON.stringify(payload),
-        }
+        },
       );
 
       const updated = await res.json();
       const updatedUser = updated.user || updated.data || updated;
-      
+
       if (updatedUser) {
-        // ✅ Only update name and image in Redux
         dispatch(
           updateUser({
             ...currentUser,
             name: updatedUser.name,
             image: updatedUser.image,
             isProfileComplete: updatedUser.isProfileComplete,
-          })
+          }),
         );
-        
+
         setEditMode(false);
       } else {
         console.error("Updated tutor data missing");

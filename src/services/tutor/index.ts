@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 export const getAllTutors = async () => {
@@ -6,18 +5,17 @@ export const getAllTutors = async () => {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_API}/api/users/tutors`,
       {
-        next: {
-          tags: ["TUTORS"],
-        },
-      }
+        cache: "no-store",
+      },
     );
-    
+
     if (!res.ok) {
       throw new Error("Failed to fetch data");
     }
     return await res.json();
-  } catch (error: any) {
-    return Error("error to fetch data", error?.message);
+  } catch (error) {
+    console.error("Error fetching tutors:", error);
+    return null;
   }
 };
 
@@ -26,16 +24,15 @@ export const getSingleTutor = async (tutorId: string) => {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_API}/api/users/tutors/${tutorId}`,
       {
-        next: {
-          tags: ["TUTORS"],
-        },
-      }
+        cache: "no-store",
+      },
     );
     if (!res.ok) {
       throw new Error("Failed to fetch data");
     }
     return await res.json();
-  } catch (error: any) {
-    return Error("error to fetch data", error?.message);
+  } catch (error) {
+    console.error("Error fetching tutor:", error);
+    return null;
   }
 };
